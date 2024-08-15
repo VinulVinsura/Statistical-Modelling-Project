@@ -1,0 +1,118 @@
+---
+title: "Sleep"
+author: "vinul"
+date: "2024-07-22"
+output: html_document
+---
+
+```{r}
+sleep <- read.csv("D:/My Project/STAT-Project/sleep_data.csv")
+head(sleep)
+
+sum(is.na(sleep))
+
+library(psych)
+
+head(sleep)
+
+str(sleep)
+
+sleep$QualityofSleep <- as.factor(sleep$QualityofSleep)
+sleep$StressLevel <- as.factor(sleep$StressLevel)
+sleep$PhysicalActivityLevel <- as.factor(sleep$PhysicalActivityLevel)
+sleep$Gender <- as.factor(sleep$Gender)
+sleep$Occupation <- as.factor(sleep$Occupation)
+sleep$BMILevels <- as.factor(sleep$BMILevels)
+
+str(sleep)
+
+#describe(sleep[c("SleepDuration" , "QualityofSleep" ,	"Age" ,	"PhysicalActivityLevel" ,	"StressLevel"	, "BloodPressure 1"	, "BloodPressure 2" ,	"HeartRate"	, "DailySteps"	, "BMILevels" ,	"Occupation" ,	"Gender")])
+
+str(sleep)
+
+model1 <- lm(HeartRate ~ . ,sleep)
+summary(model1)
+
+head(sleep)
+sleep_filtered <- data.frame(sleep[,-c(1,2,3,5,6,7,8,12)])
+model2 <- lm(HeartRate ~ ., sleep_filtered)
+summary(model2)
+             
+  
+library(leaps)
+
+regfit.full <- regsubsets(HeartRate ~ . ,sleep)
+regfit.summary <- summary(regfit.full)
+regfit.summary
+
+par(mfrow = c(1, 2)) 
+plot(regfit.summary$rss, xlab = "Number of Variables", ylab = "RSS", type = "l") 
+RSs.min<-which.min(regfit.summary$rss) 
+points(RSs.min,regfit.summary$rss[RSs.min],col="blue",cex = 2, pch = 20) 
+abline(v=RSs.min) 
+ 
+plot(regfit.summary$adjr2, xlab = "Number of Variables", ylab = "Adjusted RSq", 
+type = "l") 
+ 
+adjr2.max <- which.max(regfit.summary$adjr2) 
+points(adjr2.max, regfit.summary$adjr2[adjr2.max], col = "red", cex = 2, pch = 
+20) 
+abline(v=adjr2.max) 
+
+par(mfrow = c(1, 2)) 
+plot(regfit.summary$cp, xlab = "Number of Variables", ylab = "Cp", type = "l") 
+cp.min <- which.min(regfit.summary$cp) 
+points(cp.min, regfit.summary$cp[cp.min], col = "red", cex = 2, pch = 20) 
+bic.min <- which.min(regfit.summary$bic) 
+plot(regfit.summary$bic, xlab = "Number of Variables", ylab = "BIC", type = "l") 
+points(bic.min, regfit.summary$bic[bic.min], col = "red", cex = 2, pch = 20)
+
+data.frame( 
+Adj.R2 = (regfit.summary$adjr2), 
+CP = (regfit.summary$cp), 
+BIC = (regfit.summary$bic), 
+RSS=regfit.summary$rss 
+) 
+#################################################
+model3 <-  lm(HeartRate ~  PhysicalActivityLevel + BMILevels + Occupation , data = sleep)
+summary(model3)
+
+#Residual vs Fitted - Check const variance
+plot(model3,which = 1, col = c("blue"))
+
+#Q-Q plot - Normality of residuals check
+plot(model3, which = 2, col = c("red"))
+
+#Scale- Location
+plot(model3,which = 3, col = c("green"))
+
+plot(model3$residuals,main = "residuals vs Run order",xlab ="Run order")
+
+
+
+s1<-summary(sleep$SleepDuration)
+s2<-summary(sleep$Age)
+s3<-summary(sleep$BloodPressure.1)
+s4<-summary(sleep$BloodPressure.2)
+s5<-summary(sleep$HeartRate)
+s6<-summary(sleep$DailySteps)
+
+S<-data.frame(cbind(s1,s2,s3,s4,s5,s6))
+names(S)<-c("Sleep Duration","Age","Sys Bp","Dio Bp","Heart Rate","Daily Steps")
+
+
+```
+
+
+```{r}
+ summary(model1)
+
+summary(sleep$SleepDuration)
+#summary()
+
+out1<-boxplot.stats(sleep$HeartRate)$out
+out1
+
+
+```
+
